@@ -15,13 +15,13 @@ USER bishal
 
 # Install Python dependencies
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt --user
+RUN pip3 install --no-cache-dir -r requirements.txt --user
 
 # Copy the rest of the application code
 COPY . /app/
 
-# Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 8501
 
-# Define the command to run the application
-CMD ["python", "main.py"]
+ENTRYPOINT [ "streamlit", "run" ]
+
+CMD ["app.py"]

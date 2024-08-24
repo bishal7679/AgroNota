@@ -1,20 +1,20 @@
 # import streamlit as st
 # import pandas as pd
-# from functions import train_and_predict_N_category, train_and_predict_K_category, train_and_predict_P_category, train_evaluate_random_forest
+# from functions import train_and_predict_N_category, train_evaluate_random_forest
 # from cost import crop
+# import webbrowser
 
 # # Load data
 # df = pd.read_csv("Crop_recommendation.csv")
 
-# # Check DataFrame columns
-# required_columns = ['N_category', 'K_category', 'P_category']
-# missing_columns = [col for col in required_columns if col not in df.columns]
-
-# if missing_columns:
-#     st.error(
-#         f"Error: Missing columns {', '.join(missing_columns)} in the DataFrame.")
-# else:
-#     st.write("DataFrame columns:", df.columns)
+# # Define crop options and IDs
+# crop_ids = {
+#     'rice': 1, 'maize': 2, 'chickpea': 3, 'kidneybeans': 4, 'pigeonpeas': 5,
+#     'mothbeans': 6, 'mungbean': 7, 'blackgram': 8, 'lentil': 9, 'pomegranate': 10,
+#     'banana': 11, 'mango': 12, 'grapes': 13, 'watermelon': 14, 'muskmelon': 15,
+#     'apple': 16, 'orange': 17, 'papaya': 18, 'coconut': 19, 'cotton': 20,
+#     'jute': 21, 'coffee': 22
+# }
 
 # # Sidebar navigation
 # st.sidebar.title("Navigation")
@@ -23,31 +23,30 @@
 
 # if option == "Home":
 #     st.title("Welcome to AgroNota 😊")
-#     st.image('assets/logo-2.jpg', use_column_width=True)
+#     st.image('assets/logo-2.jpg', width=500)
 #     st.write("Agronota predicts by how much you can enrich your precious soil, while informing you of its potential bounty.")
-#     st.write("A farmer's dream, manifest.")
+#     st.write("A farmer's dream, manifest ✨")
 
 # elif option == "Crop Yield":
-#     st.title("Crop Yield")
+#     st.title("🌾 Crop Yield")
 
 #     with st.form("crop_yield_form"):
-#         selected_crop = st.selectbox("Select Crop", ['rice', 'maize', 'chickpea', 'kidneybeans', 'pigeonpeas', 'mothbeans', 'mungbean', 'blackgram', 'lentil',
-#                             'pomegranate', 'banana', 'mango', 'grapes', 'watermelon', 'muskmelon', 'apple', 'orange', 'papaya', 'coconut', 'cotton', 'jute', 'coffee'])
+#         selected_crop = st.selectbox("Select Crop", list(crop_ids.keys()))
 #         grain_weight = st.number_input(
 #             "Grain Weight (in pounds)", min_value=0.0)
 #         grain_moisture = st.number_input("Grain Moisture (%)", min_value=0.0)
 #         harvested_area = st.number_input(
 #             "Harvested Area (in square feet)", min_value=0.0)
-
 #         submit_button = st.form_submit_button("Calculate Projected Yield")
 
 #         if submit_button:
 #             yield_result = crop(selected_crop, grain_weight,
 #                                 grain_moisture, harvested_area)
-#             st.write(f"Projected Yield: {yield_result} bushels")
+#             st.write(f"The crop yield for {selected_crop} in the specified conditions is projected to be {
+#                      yield_result} megagram per hectare.")
 
 # elif option == "Soil Minerals":
-#     st.title("Soil Minerals")
+#     st.title("🌱 Predict Optimal Nitrogen Value")
 
 #     with st.form("soil_minerals_form"):
 #         humidity = st.number_input("Humidity (%)", min_value=0.0)
@@ -55,59 +54,56 @@
 #             "Temperature (°C)", min_value=-50.0, max_value=50.0)
 #         rainfall = st.number_input("Rainfall (mm)", min_value=0.0)
 #         ph = st.number_input("Soil pH", min_value=0.0, max_value=14.0)
-#         crop_id = st.selectbox("Select Crop", df['label'].unique())
-
+#         selected_crop = st.selectbox("Select Crop", list(crop_ids.keys()))
 #         submit_button = st.form_submit_button("Predict Optimal Nitrogen")
 
 #         if submit_button:
-#             try:
-#                 result_n = train_and_predict_N_category(
-#                     df, humidity, temperature, rainfall, ph, crop_id)
-#                 st.write(f"Predicted Nitrogen Category: {result_n}")
-
-#                 result_k = train_and_predict_K_category(
-#                     df, humidity, temperature, rainfall, ph, crop_id)
-#                 st.write(f"Predicted Potassium Category: {result_k}")
-
-#                 result_p = train_and_predict_P_category(
-#                     df, humidity, temperature, rainfall, ph, crop_id)
-#                 st.write(f"Predicted Phosphorus Category: {result_p}")
-#             except KeyError as e:
-#                 st.error(f"KeyError: {e}")
+#             crop_id = crop_ids[selected_crop]
+#             result_n = train_and_predict_N_category(
+#                 df, humidity, temperature, rainfall, ph, crop_id)
+#             best_practices = train_evaluate_random_forest(
+#                 df, result_n, temperature, humidity, ph, rainfall)
+#             st.write(f"Optimal Nitrogen content for {
+#                      selected_crop}: {result_n}")
+#             st.write(f"Recommended for this soil: {best_practices}")
 
 # elif option == "Resources":
-#     st.title("Important Links and Resources")
+#     st.title("📚 Important Links and Resources")
 
 #     if st.button("Soil Testing - MSU"):
-#         st.write("Link to Soil Testing - MSU")
+#         webbrowser.open("https://homesoiltest.msu.edu/get-started")
 #     if st.button("NPK Fertilizer Calculator"):
-#         st.write("Link to NPK Fertilizer Calculator")
+#         webbrowser.open("https://aesl.ces.uga.edu/soil/fertcalc/")
 #     if st.button("United States Department of Agriculture"):
-#         st.write("Link to USDA")
+#         webbrowser.open("https://www.usda.gov/")
 #     if st.button("Minority and Women Farmers and Ranchers"):
-#         st.write("Link to Minority and Women Farmers and Ranchers")
+#         webbrowser.open(
+#             "https://www.fsa.usda.gov/programs-and-services/farm-loan-programs/minority-and-women-farmers-and-ranchers/index")
 #     if st.button("Soil Health Institute"):
-#         st.write("Link to Soil Health Institute")
+#         webbrowser.open("https://soilhealthinstitute.org/")
 #     if st.button("How much is too much for the climate?"):
-#         st.write("Link to Climate Impact Information")
+#         webbrowser.open(
+#             "https://msutoday.msu.edu/news/2014/how-much-fertilizer-is-too-much-for-the-climate")
+        
+#     st.write("Made with ❤️")
 
 import streamlit as st
 import pandas as pd
-from functions import train_and_predict_N_category, train_and_predict_K_category, train_and_predict_P_category, train_evaluate_random_forest
+from functions import train_and_predict_N_category, train_evaluate_random_forest
 from cost import crop
+import webbrowser
 
 # Load data
 df = pd.read_csv("Crop_recommendation.csv")
 
-# Check DataFrame columns
-required_columns = ['N', 'K', 'P']
-missing_columns = [col for col in required_columns if col not in df.columns]
-
-if missing_columns:
-    st.error(f"Error: Missing columns {
-             ', '.join(missing_columns)} in the DataFrame.")
-else:
-    st.write("DataFrame columns:", df.columns)
+# Define crop options and IDs
+crop_ids = {
+    'rice': 1, 'maize': 2, 'chickpea': 3, 'kidneybeans': 4, 'pigeonpeas': 5,
+    'mothbeans': 6, 'mungbean': 7, 'blackgram': 8, 'lentil': 9, 'pomegranate': 10,
+    'banana': 11, 'mango': 12, 'grapes': 13, 'watermelon': 14, 'muskmelon': 15,
+    'apple': 16, 'orange': 17, 'papaya': 18, 'coconut': 19, 'cotton': 20,
+    'jute': 21, 'coffee': 22
+}
 
 # Sidebar navigation
 st.sidebar.title("Navigation")
@@ -116,74 +112,66 @@ option = st.sidebar.radio(
 
 if option == "Home":
     st.title("Welcome to AgroNota 😊")
-    st.image('assets/logo-2.jpg', use_column_width=True)
+    st.image('assets/logo-2.jpg', width=500)
     st.write("Agronota predicts by how much you can enrich your precious soil, while informing you of its potential bounty.")
-    st.write("A farmer's dream, manifest.")
+    st.write("A farmer's dream, manifest ✨")
 
 elif option == "Crop Yield":
-    st.title("Crop Yield")
+    st.title("🌾 Crop Yield")
 
     with st.form("crop_yield_form"):
-        selected_crop = st.selectbox("Select Crop", ['rice', 'maize', 'chickpea', 'kidneybeans', 'pigeonpeas', 'mothbeans', 'mungbean', 'blackgram', 'lentil',
-                                                     'pomegranate', 'banana', 'mango', 'grapes', 'watermelon', 'muskmelon', 'apple', 'orange', 'papaya', 'coconut', 'cotton', 'jute', 'coffee'])
+        selected_crop = st.selectbox("Select Crop", list(crop_ids.keys()))
         grain_weight = st.number_input(
-            "Grain Weight (in pounds)", min_value=0.0)
-        grain_moisture = st.number_input("Grain Moisture (%)", min_value=0.0)
+            "Grain Weight (in pounds)", min_value=0)
+        grain_moisture = st.number_input("Grain Moisture (%)", min_value=0)
         harvested_area = st.number_input(
-            "Harvested Area (in square feet)", min_value=0.0)
-
+            "Harvested Area (in square feet)", min_value=0)
         submit_button = st.form_submit_button("Calculate Projected Yield")
 
         if submit_button:
             yield_result = crop(selected_crop, grain_weight,
                                 grain_moisture, harvested_area)
-            st.write(f"Projected Yield: {yield_result} bushels")
+            st.write("The crop yield for {} in the specified conditions is projected to be {} megagram per hectare.".format(
+                selected_crop, yield_result))
 
 elif option == "Soil Minerals":
-    st.title("Soil Minerals")
+    st.title("🌱 Predict Optimal Nitrogen Value")
 
     with st.form("soil_minerals_form"):
-        humidity = st.number_input("Humidity (%)", min_value=0.0)
+        humidity = st.number_input("Humidity (%)", min_value=0)
         temperature = st.number_input(
-            "Temperature (°C)", min_value=-50.0, max_value=50.0)
-        rainfall = st.number_input("Rainfall (mm)", min_value=0.0)
-        ph = st.number_input("Soil pH", min_value=0.0, max_value=14.0)
-        crop_id = st.selectbox("Select Crop", df['label'].unique())
-
+            "Temperature (°C)", min_value=-50, max_value=50)
+        rainfall = st.number_input("Rainfall (mm)", min_value=0)
+        ph = st.number_input("Soil pH (<=14)", min_value=0, max_value=14)
+        selected_crop = st.selectbox("Select Crop", list(crop_ids.keys()))
         submit_button = st.form_submit_button("Predict Optimal Nitrogen")
 
         if submit_button:
-            if not all(col in df.columns for col in ['N', 'K', 'P']):
-                st.error(
-                    "Required columns for prediction are missing in the DataFrame.")
-            else:
-                try:
-                    result_n = train_and_predict_N_category(
-                        df, humidity, temperature, rainfall, ph, crop_id)
-                    st.write(f"Predicted Nitrogen Category: {result_n}")
-
-                    result_k = train_and_predict_K_category(
-                        df, humidity, temperature, rainfall, ph, crop_id)
-                    st.write(f"Predicted Potassium Category: {result_k}")
-
-                    result_p = train_and_predict_P_category(
-                        df, humidity, temperature, rainfall, ph, crop_id)
-                    st.write(f"Predicted Phosphorus Category: {result_p}")
-                except KeyError as e:
-                    st.error(f"KeyError: {e}")
+            crop_id = crop_ids[selected_crop]
+            result_n = train_and_predict_N_category(
+                df, humidity, temperature, rainfall, ph, crop_id)
+            best_practices = train_evaluate_random_forest(
+                df, result_n, temperature, humidity, ph, rainfall)
+            st.write("Optimal Nitrogen content for {}: {}".format(
+                selected_crop, result_n))
+            st.write("Recommended for this soil: {}".format(best_practices))
 
 elif option == "Resources":
-    st.title("Important Links and Resources")
+    st.title("📚 Important Links and Resources")
 
     if st.button("Soil Testing - MSU"):
-        st.write("Link to Soil Testing - MSU")
+        webbrowser.open("https://homesoiltest.msu.edu/get-started")
     if st.button("NPK Fertilizer Calculator"):
-        st.write("Link to NPK Fertilizer Calculator")
+        webbrowser.open("https://aesl.ces.uga.edu/soil/fertcalc/")
     if st.button("United States Department of Agriculture"):
-        st.write("Link to USDA")
+        webbrowser.open("https://www.usda.gov/")
     if st.button("Minority and Women Farmers and Ranchers"):
-        st.write("Link to Minority and Women Farmers and Ranchers")
+        webbrowser.open(
+            "https://www.fsa.usda.gov/programs-and-services/farm-loan-programs/minority-and-women-farmers-and-ranchers/index")
     if st.button("Soil Health Institute"):
-        st.write("Link to Soil Health Institute")
+        webbrowser.open("https://soilhealthinstitute.org/")
     if st.button("How much is too much for the climate?"):
-        st.write("Link to Climate Impact Information")
+        webbrowser.open(
+            "https://msutoday.msu.edu/news/2014/how-much-fertilizer-is-too-much-for-the-climate")
+
+    st.write("Made with ❤️")

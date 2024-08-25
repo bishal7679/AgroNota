@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: agronotaapp
+  name: agronotaapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agronotaapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: agronotaapp
+    spec:
+      containers:
+      - image: bishal7679/agronota:latest
+        name: agronotacontainer
+        ports:
+        - containerPort: 8501
+          protocol: TCP
